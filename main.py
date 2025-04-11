@@ -5,9 +5,13 @@ import os
 
 app = FastAPI()
 
+@app.get("/")
+def root():
+    return {"message": "Hola Railway desde FastAPI"}
+
 class RutaPDFRequest(BaseModel):
     rutaPdf: str
-
+    
 @app.post("/leer-pdf")
 async def leer_pdf(request: RutaPDFRequest):
     script_path = "./scripts/Leer_PDF.py"
