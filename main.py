@@ -1,5 +1,4 @@
 from fastapi import FastAPI, UploadFile, File
-from pydantic import BaseModel
 import subprocess
 import os
 
@@ -9,12 +8,12 @@ app = FastAPI()
 def root():
     return {"message": "Hola Railway desde FastAPI"}
 
-class RutaPDFRequest(BaseModel):
-    rutaPdf: str
-    
 @app.post("/leer-pdf")
 async def leer_pdf(file: UploadFile = File(...)):
     try:
+        # Crea el directorio 'temp' si no existe
+        os.makedirs("./temp", exist_ok=True)
+
         # Guarda el archivo temporalmente
         temp_path = f"./temp/{file.filename}"
         with open(temp_path, "wb") as f:
