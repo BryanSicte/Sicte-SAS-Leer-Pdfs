@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 import subprocess
 import os
+import json  # Importar el módulo json para trabajar con JSON
 
 app = FastAPI()
 
@@ -34,7 +35,12 @@ async def leer_pdf(file: UploadFile = File(...)):
         if process.returncode != 0:
             return {"error": "Error en el script", "detalle": stderr}
 
-        return {"resultado": stdout}
+        # Convertir el resultado a un objeto JSON
+        try:
+            resultado_json = json.loads(stdout)  # Convertimos la cadena a JSON
+            return {"resultado": resultado_json}  # Devolvemos el JSON
+        except json.JSONDecodeError as e:
+            return {"error": "Error al convertir el resultado a JSON", "detalle": str(e)}
 
     except Exception as e:
         return {"error": "Error al ejecutar el script", "detalle": str(e)}
