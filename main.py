@@ -38,7 +38,7 @@ async def leer_pdf(file: UploadFile = File(...)):
         # Convertir el resultado a un objeto JSON
         try:
             resultado_json = json.loads(stdout)  # Convertimos la cadena a JSON
-            return {"resultado": resultado_json}  # Devolvemos el JSON
+            return resultado_json  # Devolvemos el JSON
         except json.JSONDecodeError as e:
             return {"error": "Error al convertir el resultado a JSON", "detalle": str(e)}
 
