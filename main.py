@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 import subprocess
 import os
@@ -13,18 +13,23 @@ class RutaPDFRequest(BaseModel):
     rutaPdf: str
     
 @app.post("/leer-pdf")
-async def leer_pdf(request: RutaPDFRequest):
-    script_path = "./scripts/Leer_PDF.py"
-    ruta_pdf = f"./temp/{request.rutaPdf}"
+async def leer_pdf(file: UploadFile = File(...)):
+    temp_folder = "./temp"
+    os.makedirs(temp_folder, exist_ok=True)
+
+    ruta_pdf = os.path.join(temp_folder, file.filename)
+
+    with open(ruta_pdf, "wb") as f:
+        content = await file.read()
+        f.write(content)
 
     try:
         process = subprocess.Popen(
-            ["python3", script_path, ruta_pdf],
+            ["python3", "./scripts/Leer_PDF.py", ruta_pdf],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
         )
-
         stdout, stderr = process.communicate()
 
         if process.returncode != 0:
