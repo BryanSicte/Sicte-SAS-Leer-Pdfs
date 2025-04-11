@@ -14,27 +14,27 @@ class RutaPDFRequest(BaseModel):
     
 @app.post("/leer-pdf")
 async def leer_pdf(file: UploadFile = File(...)):
-    temp_folder = "./temp"
-    os.makedirs(temp_folder, exist_ok=True)
-
-    ruta_pdf = os.path.join(temp_folder, file.filename)
-
-    with open(ruta_pdf, "wb") as f:
-        content = await file.read()
-        f.write(content)
-
     try:
+        # Guarda el archivo temporalmente
+        temp_path = f"./temp/{file.filename}"
+        with open(temp_path, "wb") as f:
+            content = await file.read()
+            f.write(content)
+
+        # Ejecuta el script con el archivo
+        script_path = "./scripts/Leer_PDF.py"
         process = subprocess.Popen(
-            ["python3", "./scripts/Leer_PDF.py", ruta_pdf],
+            ["python3", script_path, temp_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
         )
+
         stdout, stderr = process.communicate()
 
         if process.returncode != 0:
             return {"error": "Error en el script", "detalle": stderr}
-        
+
         return {"resultado": stdout}
 
     except Exception as e:
